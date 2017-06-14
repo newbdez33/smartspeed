@@ -39,10 +39,14 @@
 	self.window.backgroundColor = [UIColor whiteColor];
     
 	audioPlayer = [[STKAudioPlayer alloc] initWithOptions:(STKAudioPlayerOptions){ .flushQueueOnSeek = YES, .enableVolumeMixer = NO, .equalizerBandFrequencies = {50, 100, 200, 400, 800, 1600, 2600, 16000} }];
+    
 	audioPlayer.meteringEnabled = YES;
+    audioPlayer.equalizerEnabled = NO;
 	audioPlayer.volume = 1;
     
-	self.audioPlayerView = [[AudioPlayerView alloc] initWithFrame:self.window.bounds andAudioPlayer:audioPlayer];
+    CGRect f = self.window.bounds;
+    f.size.height = 2000;
+	self.audioPlayerView = [[AudioPlayerView alloc] initWithFrame:f andAudioPlayer:audioPlayer];
     
 	self.audioPlayerView.delegate = self;
     
@@ -51,7 +55,10 @@
 	
     [self.window makeKeyAndVisible];
     
-    [self.window.rootViewController.view addSubview:self.audioPlayerView];
+    UIScrollView * scv = [[UIScrollView alloc] initWithFrame:self.window.bounds];
+    scv.contentSize = self.audioPlayerView.frame.size;
+    [scv addSubview:self.audioPlayerView];
+    [self.window.rootViewController.view addSubview:scv];
 	
     return YES;
 }
@@ -79,7 +86,7 @@
             float k = 0.06;
             newRate = 1 + MIN( (silentPower - peak)*k, 1 );
         }
-        NSLog(@"s:%@, p:%@, new rate:%@", @(silentPower), @(peak), @(newRate));
+        //NSLog(@"s:%@, p:%@, new rate:%@", @(silentPower), @(peak), @(newRate));
         [audioPlayer setplaybackbackspeed:(AudioUnitParameterValue) newRate];
         
 

@@ -66,7 +66,8 @@
 	UIButton* queuePcmWaveFileFromHTTPButton;
 	UIButton* playFromLocalFileButton;
 	UIView* meter;
-    
+    NSArray * hzs;
+    UILabel * eqlabel;
 }
 
 @property (readwrite, retain) STKAudioPlayer* audioPlayer;

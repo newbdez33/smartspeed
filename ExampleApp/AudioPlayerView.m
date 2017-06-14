@@ -53,6 +53,8 @@
 	
     if (self)
 	{
+        hzs = @[@50, @100, @200, @400, @800, @1600, @2600, @16000];
+        
         self.audioPlayer = audioPlayerIn;
         
 		CGSize size = CGSizeMake(220, 50);
@@ -67,7 +69,7 @@
          self.textField.layer.borderWidth = 1;
         self.textField.font = [UIFont systemFontOfSize:12];
          self.textField.layer.borderColor = UIColor.lightGrayColor.CGColor;
-        self.textField.text = @"https://truecrimegarage.podbean.com/mf/player-preload/hwjbvk/Tupac_Shakur_Podcast_2.mp3";
+        self.textField.text = @"http://audio.checked.fm/Checked-36.mp3?_=1";
         [self addSubview: self.textField];
         
         playFromIcecastButton = [UIButton buttonWithType:UIButtonTypeRoundedRect];
@@ -122,14 +124,35 @@
         playbackspeedslider.value=1;
         
         
+        NSArray *eqs = @[@(-27), @(10), @(20), @(24), @(22), @(24), @(13), @(-15)];
+        for (int i=0; i<hzs.count; i++) {
+            UILabel * lab = [[UILabel alloc] initWithFrame:CGRectMake(20, 500 + i * 35, 50, 30)];
+            lab.text = [NSString stringWithFormat:@"%@ hz", hzs[i]];
+            lab.font = [UIFont systemFontOfSize:10];
+            [self addSubview:lab];
+            UISlider * item = [[UISlider alloc] initWithFrame:CGRectMake(70, 500 + i * 35, 280, 30)];
+            item.minimumValue = -96;
+            item.maximumValue = 24;
+            item.continuous = NO;
+            NSNumber * eq = eqs[i];
+            item.value = eq.integerValue;
+            item.tag = 1000+i;
+            [item addTarget:self action:@selector(eqChanged) forControlEvents:UIControlEventValueChanged];
+            [self addSubview:item];
+        }
+        eqlabel = [[UILabel alloc] initWithFrame:CGRectMake(20, 500 + 8 * 35, 300, 30)];
+        eqlabel.font = [UIFont systemFontOfSize:15];
+        [self addSubview:eqlabel];
+        [self eqChanged];
+        
         
         size = CGSizeMake(80, 50);
         
         repeatSwitch = [[UISwitch alloc] initWithFrame:CGRectMake(30, frame.size.height * 0.15 + 180, size.width, size.height)];
         repeatSwitch.hidden = YES;
-        enableEqSwitch = [[UISwitch alloc] initWithFrame:CGRectMake(frame.size.width - size.width - 30, frame.size.height * 0.15 + 180, size.width, size.height)];
+        enableEqSwitch = [[UISwitch alloc] initWithFrame:CGRectMake(frame.size.width - size.width - 30, 180, size.width, size.height)];
         enableEqSwitch.on = audioPlayer.equalizerEnabled;
-        enableEqSwitch.hidden = YES;
+        //enableEqSwitch.hidden = YES;
         [enableEqSwitch addTarget:self action:@selector(onEnableEqSwitch) forControlEvents:UIControlEventAllTouchEvents];
 
         label = [[UILabel alloc] initWithFrame:CGRectMake(0, slider.frame.origin.y + slider.frame.size.height + 40, frame.size.width, 25)];
@@ -176,9 +199,25 @@
     return self;
 }
 
+- (void) eqChanged {
+    NSMutableString * str = [NSMutableString new];
+    [str appendString:@"EQ:"];
+    for (int i=0; i<hzs.count; i++) {
+        UISlider * item = [self viewWithTag:1000+i];
+        [audioPlayer setGain:@(item.value).integerValue forEqualizerBand:i];
+        NSLog(@"%@ = %@", hzs[i], @(item.value));
+        [str appendString:[NSString stringWithFormat:@"%@", @(@(item.value).integerValue)]];
+        if ( i < hzs.count - 1) {
+            [str appendString:@","];
+        }
+    }
+    eqlabel.text = str;
+}
+
 -(void) onEnableEqSwitch
 {
     audioPlayer.equalizerEnabled = self->enableEqSwitch.on;
+
 }
 
 -(void) sliderChanged
