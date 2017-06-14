@@ -1,0 +1,7 @@
+app_identifier "com.podbean.app.demo" # The bundle identifier of your app
+apple_id "podbean@gmail.com" # Your Apple email address
+
+team_id "6T9Z7UUR63" # Developer Portal Team ID
+
+# you can even provide different app identifiers, Apple IDs and team names per lane:
+# More information: https://github.com/fastlane/fastlane/blob/master/fastlane/docs/Appfile.md
